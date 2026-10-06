@@ -1,0 +1,31 @@
+<main>
+  <header class="masthead">
+    <div><p class="eyebrow">DESAFIO DE DESENVOLVIMENTO</p><h1>Operação<br><i>em dia.</i></h1></div>
+    <p class="intro">Uma visão simples para conferir comissões, registrar o estoque e calcular encargos de vencimento.</p>
+  </header>
+
+  <nav aria-label="Módulos">
+    <button [class.selected]="active === 'commissions'" (click)="select('commissions')"><span>01</span> Comissões</button>
+    <button [class.selected]="active === 'inventory'" (click)="select('inventory')"><span>02</span> Estoque</button>
+    <button [class.selected]="active === 'interest'" (click)="select('interest')"><span>03</span> Juros</button>
+  </nav>
+
+  <p class="notice" *ngIf="message">{{ message }}</p>
+
+  <section *ngIf="active === 'commissions'" class="panel commissions">
+    <div class="section-title"><p>COMERCIAL</p><h2>Comissão por pessoa</h2><small>0% abaixo de R$ 100, 1% até R$ 499,99 e 5% a partir de R$ 500.</small></div>
+    <div class="table-head"><span>Vendedor</span><span>Vendas</span><span>Faturamento</span><span>Comissão</span></div>
+    <article class="commission-row" *ngFor="let row of commissions; index as i"><b>{{ ('0' + (i + 1)).slice(-2) }}</b><strong>{{ row.seller }}</strong><span>{{ row.salesCount }} registros</span><span>{{ row.salesTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span><em>{{ row.commissionTotal | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</em></article>
+  </section>
+
+  <section *ngIf="active === 'inventory'" class="two-col">
+    <div class="panel"><div class="section-title"><p>DEPÓSITO</p><h2>Posição atual</h2></div><article class="stock-row" *ngFor="let product of products"><span>#{{ product.productCode }}</span><strong>{{ product.description }}</strong><b>{{ product.stock }}</b><small>unidades</small></article></div>
+    <form class="panel form" [formGroup]="movementForm" (ngSubmit)="submitMovement()"><div class="section-title"><p>NOVA AÇÃO</p><h2>Movimentar produto</h2></div><label>Produto<select formControlName="productCode"><option *ngFor="let product of products" [ngValue]="product.productCode">{{ product.productCode }} · {{ product.description }}</option></select></label><label>Tipo<select formControlName="type"><option value="ENTRY">Entrada</option><option value="EXIT">Saída</option></select></label><label>Quantidade<input type="number" min="1" formControlName="quantity"></label><label>Descrição<input placeholder="Ex.: recebimento da nota 123" formControlName="description"></label><button type="submit" [disabled]="loading">{{ loading ? 'Registrando...' : 'Registrar movimentação' }}</button></form>
+  </section>
+
+  <section *ngIf="active === 'interest'" class="two-col interest">
+    <form class="panel form" [formGroup]="interestForm" (ngSubmit)="calculateInterest()"><div class="section-title"><p>FINANCEIRO</p><h2>Calcular multa</h2><small>Aplicação diária de 2,5% após o vencimento.</small></div><label>Valor original<input type="number" min="0.01" step="0.01" formControlName="amount"></label><label>Data de vencimento<input type="date" formControlName="dueDate"></label><button type="submit">Calcular agora</button></form>
+    <div class="panel result" *ngIf="interestResult; else empty"><p>RESULTADO EM {{ interestResult.calculationDate | date:'dd/MM/yyyy' }}</p><strong>{{ interestResult.totalAmount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong><dl><div><dt>Dias em atraso</dt><dd>{{ interestResult.daysLate }}</dd></div><div><dt>Multa acumulada</dt><dd>{{ interestResult.interestAmount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</dd></div><div><dt>Valor original</dt><dd>{{ interestResult.originalAmount | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</dd></div></dl></div>
+    <ng-template #empty><div class="panel empty"><p>Preencha os campos ao lado para ver o valor atualizado do título.</p></div></ng-template>
+  </section>
+</main>

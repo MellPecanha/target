@@ -1,0 +1,5 @@
+{
+  "compilerOptions": { "outDir": "./out-tsc/app", "strict": true, "noImplicitReturns": true, "skipLibCheck": true, "module": "ES2022", "moduleResolution": "bundler" },
+  "files": ["src/main.ts"],
+  "include": ["src/**/*.d.ts"]
+}
