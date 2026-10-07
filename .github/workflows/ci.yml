@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  node-api:
+    name: Node API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: node-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: node-api/yarn.lock
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn test
+
+  angular:
+    name: Angular frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend-angular
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+          cache-dependency-path: frontend-angular/yarn.lock
+
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+
+  csharp-api:
+    name: C sharp API
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: csharp-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - run: dotnet restore
+      - run: dotnet build --no-restore
